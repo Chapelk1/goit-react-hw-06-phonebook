@@ -1,39 +1,40 @@
-import PropTypes from 'prop-types';
-import {useState} from 'react';
-import { Form, Label, Wrap, Input, Btn, } from 'components/ContactForm/ContactForm.styled';
+import shortid from 'shortid';
+import {
+  Form,
+  Label,
+  Wrap,
+  Input,
+  Btn,
+} from 'components/ContactForm/ContactForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
 
-export function ContactForm({onSubmit}) {
-  const [name, setName] = useState('')
-  const [number, setNumber] = useState('')
-
-  const formValue = { name, number }
+export function ContactForm() {
+  const allContacts = useSelector(state => state.contacts.allContacts)
+  const dispatch = useDispatch()
   
-  const inputValueHandler = e => {
-    const { name, value } = e.currentTarget;
-    
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-
-      case 'number':
-        setNumber(value);
-        break;
-
-      default:
-        return;
-    }
-  };
-
-  const handleSubmit = e => {
+  const addToContact = e => {
     e.preventDefault();
-    onSubmit(formValue);
-    setName('');
-    setNumber('');
+    const {name, number} = e.target.elements
+
+    const contactExists = allContacts.some(
+      contact => contact.name === name.value
+    );
+    if (contactExists) {
+      return alert(`${name.value} is already in contacts.`)
+    }
+    const contact = {
+      id: shortid(),
+      name: name.value,
+      number: number.value,
+    };
+
+    dispatch(addContact(contact));
+    e.currentTarget.reset()
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={addToContact}>
       <Wrap>
         <Label>
           Name
@@ -43,8 +44,6 @@ export function ContactForm({onSubmit}) {
             pattern="^[a-zA-Zа-яА-Я]+(([' \-][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
-            value={name}
-            onChange={inputValueHandler}
           />
         </Label>
         <Label>
@@ -55,8 +54,6 @@ export function ContactForm({onSubmit}) {
             pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
-            value={number}
-            onChange={inputValueHandler}
           />
         </Label>
       </Wrap>
@@ -64,7 +61,6 @@ export function ContactForm({onSubmit}) {
     </Form>
   );
 }
-
 
 // ===============================================
 
@@ -122,9 +118,3 @@ export function ContactForm({onSubmit}) {
 //   }
 // }
 
-
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func,
-  contacts: PropTypes.object,
-}

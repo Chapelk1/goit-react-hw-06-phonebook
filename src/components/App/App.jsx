@@ -1,73 +1,27 @@
-import {useState, useEffect} from "react";
-import shortid from 'shortid';
-import {ContactList} from 'components/ContactList/ContactList'
 import { ContactForm } from "components/ContactForm/ContactForm";
+import { ContactList } from 'components/ContactList/ContactList';
 import { Filter } from 'components/Filter/Filter'
 import { Section, Title, SecondTitle,  } from 'components/App/App.styled';
 
-const LS_CONTACTS = 'CONTACTS'
+
 
 export function App() {
-  const [contacts, setContacts] = useState(() => {
-    const localS = JSON.parse(localStorage.getItem(LS_CONTACTS));
-    return localS ? [...localS] : [];
-  });
-  const [filter, setFilter] = useState('')
   
-  useEffect(() => {
-    localStorage.setItem(LS_CONTACTS, JSON.stringify(contacts));
-  }, [contacts]);
 
-  const filtered = e => {
-    setFilter(e.currentTarget.value);
-  };
-
-  const deleteContact = contactId => {
-    setContacts(prevState =>
-      prevState.filter(contact => contactId !== contact.id)
-    );
-  };
-
-  const addContact = ({ name, number }) => {
-    const contactExists = contacts.some(
-      contact => contact.name === name
-    );
-    if (contactExists) {
-      return alert(`${name} is already in contacts.`);
-    }
-    const contact = {
-      id: shortid.generate(),
-      name,
-      number,
-    };
-
-    setContacts(prevState => [contact, ...prevState ])
-  };
-
-  const getVisibleContact = () => {
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  };
-
-  const visibleContacts = getVisibleContact();
+ 
   return (
     <Section>
       <Title>Phonebook</Title>
-      <ContactForm onSubmit={addContact} />
+      <ContactForm />
 
       <SecondTitle>Contacts</SecondTitle>
-      <Filter value={filter} onChange={filtered} />
-      <ContactList
-        contacts={visibleContacts}
-        onDeleteContact={deleteContact}
-      />
+      <Filter />
+      <ContactList/>
     </Section>
   );
 }
 
-// ==============================================
+// ============================================== V.01
 
 // export class OldApp extends Component {
 //   state = {
@@ -125,10 +79,10 @@ export function App() {
 //     }));
 //     };
 
-//     getVisibleContact = () => {
-//         const normalizedFilter = this.state.filter.toLowerCase()
-//         return this.state.contacts.filter(contact => contact.name.toLowerCase().includes(normalizedFilter))
-//     }
+    // getVisibleContact = () => {
+    //     const normalizedFilter = this.state.filter.toLowerCase()
+    //     return this.state.contacts.filter(contact => contact.name.toLowerCase().includes(normalizedFilter))
+    // }
 
 //     render() {
 //       const visibleContacts = this.getVisibleContact()
